@@ -8,9 +8,17 @@
 #include <new>
 
 #ifdef _DEBUG
+#ifdef _WIN64
 #pragma comment(lib, "jemalloc-vc140-Debug-static")
 #else
+#pragma comment(lib, "jemalloc-v140-Debug-static")
+#endif
+#else
+#ifdef _WIN64
 #pragma comment(lib, "jemalloc-vc140-Release-static")
+#else
+#pragma comment(lib, "jemalloc-v140-Release-static")
+#endif
 #endif
 
 static inline void* my_malloc(size_t size)

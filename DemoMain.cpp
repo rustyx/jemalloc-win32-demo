@@ -19,19 +19,24 @@ int main()
 {
   auto tm1 = steady_clock::now();
   vector<thread> workers;
-  const int numThreads = std::thread::hardware_concurrency();
+  static const int numThreads = std::thread::hardware_concurrency();
   for (int tid = 0; tid < numThreads; ++tid) {
     workers.emplace_back([tid]() {
-      minstd_rand rnd(tid);
-      uniform_int_distribution<int> sizeDist(1, 1500);
-      for (int it = 0; it < 10; ++it)
-      {
-        vector<unique_ptr<char[]>> vec;
-        for (int i = 0; i < 50000; ++i)
+      try {
+        minstd_rand rnd(tid);
+        uniform_int_distribution<int> sizeDist(1, 1500);
+        for (int it = 0; it < 10; ++it)
         {
-          vec.emplace_back(std::make_unique<char[]>(sizeDist(rnd)));
-          vec.back()[0] = 1;
+          vector<unique_ptr<char[]>> vec;
+          for (int i = 0; i < 50000; ++i)
+          {
+            vec.emplace_back(std::make_unique<char[]>(sizeDist(rnd)));
+            vec.back()[0] = 1;
+          }
         }
+      }
+      catch (const std::bad_alloc&) {
+        std::cerr << "Out of memory\n";
       }
     });
   }
